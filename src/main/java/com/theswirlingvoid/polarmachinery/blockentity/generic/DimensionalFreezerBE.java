@@ -13,10 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class DimensionalFreezerBE extends BlockEntity {
-	
-	public interface VoidFunction {
-		void run();
-	}
 
 	private boolean isMaster = false;
 	private boolean hasMaster = false;
