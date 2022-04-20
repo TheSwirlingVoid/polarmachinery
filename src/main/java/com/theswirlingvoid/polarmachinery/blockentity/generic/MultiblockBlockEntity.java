@@ -12,15 +12,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class DimensionalFreezerBE extends BlockEntity {
+public abstract class MultiblockBlockEntity extends BlockEntity {
 
 	private boolean isMaster = false;
 	private boolean hasMaster = false;
-	private BlockEntityType<DimensionalFreezerBE> typeBE;
+	private BlockEntityType<MultiblockBlockEntity> typeBE;
 
-	public DimensionalFreezerBE(BlockEntityType<?> type, BlockPos blockPos, BlockState blockState) {
+	@SuppressWarnings("unchecked")
+	protected MultiblockBlockEntity(BlockEntityType<?> type, BlockPos blockPos, BlockState blockState) {
 		super(type, blockPos, blockState);
-		typeBE = (BlockEntityType<DimensionalFreezerBE>) type;
+		typeBE = (BlockEntityType<MultiblockBlockEntity>) type; // only called by sub classes
 	}
 	
 	@Override
@@ -74,19 +75,19 @@ public abstract class DimensionalFreezerBE extends BlockEntity {
 	}
 
 	/**
-	 * Find all tile entities of this type and run a given function for each one.
+	 * Find all tile entities of this type connected to the one running this function, and run a given function for each connected.
 	 * @param func The function to run
-	 * @param checkedBlocks A list in which to add blocks that have been checked. Most likely you should make this {@code new ArrayList<T>()}.
+	 * @param checkedBlocks A list in which to add blocks that have been checked. Most likely you should make this code new ArrayList<BlockPos>()}.
 	 * @return A {@code List<DimensionalFreezerBE>} of affected blocks.
 	 */
-	public List<BlockPos> snakeSearchAndRun(Consumer<DimensionalFreezerBE> func, @Nullable List<BlockPos> checkedPositions) {
+	public List<BlockPos> snakeSearchAndRun(Consumer<MultiblockBlockEntity> func, @Nullable List<BlockPos> checkedPositions) {
 		checkedPositions.add(this.getBlockPos());
 		func.accept(this);														// run given function for this block
 		List<BlockPos> adjBlocksPos = this.getAdjacentParts(); 					// adjacent blocks to this specific block
 
 		for (BlockPos blockPos : adjBlocksPos) {
 			if (!checkedPositions.contains(blockPos)) {							// for every block that hasn't been checked, recurse on it
-				((DimensionalFreezerBE) this.getLevel().getBlockEntity(blockPos)).snakeSearchAndRun(func, checkedPositions);
+				((MultiblockBlockEntity) this.getLevel().getBlockEntity(blockPos)).snakeSearchAndRun(func, checkedPositions);
 			}
 		}
 		return checkedPositions;
