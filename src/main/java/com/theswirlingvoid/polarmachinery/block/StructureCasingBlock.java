@@ -57,8 +57,10 @@ public class StructureCasingBlock extends Block implements EntityBlock {
 
 		for (BlockPos blockPos : allBlocks) {
 			MultiblockBlockEntity foundBE = (MultiblockBlockEntity) level.getBlockEntity(blockPos);
+			// TODO: remove test line below
 			System.out.println(String.format("isMaster: %b; hasMaster: %b", foundBE.isMaster(), foundBE.hasMaster()));
 		}
+		// TODO: remove test line below
 		level.players().get(0).sendMessage(new TextComponent("Lowest Pos: " + mostAndLowest[0] + ". Most Pos: " + mostAndLowest[1]), Util.NIL_UUID);
 	}
 	
