@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public abstract class MultiblockBlockEntity extends BlockEntity {
 
 	private boolean isMaster = false;
-	private boolean hasMaster = false;
 	private BlockEntityType<MultiblockBlockEntity> typeBE;
 
 	@SuppressWarnings("unchecked")
@@ -28,14 +27,12 @@ public abstract class MultiblockBlockEntity extends BlockEntity {
 	public void load(CompoundTag tag) {
 		super.load(tag);
 		isMaster = tag.getBoolean("isMaster");
-		hasMaster = tag.getBoolean("hasMaster");
 	}
 
 	@Override
 	protected void saveAdditional(CompoundTag tag) {
 		super.saveAdditional(tag);
 		tag.putBoolean("isMaster", isMaster);
-		tag.putBoolean("hasMaster", hasMaster);
 	}
 
 	public boolean isMaster() {
@@ -44,14 +41,6 @@ public abstract class MultiblockBlockEntity extends BlockEntity {
 
 	public void setMaster(boolean isMaster) {
 		this.isMaster = isMaster;
-	}
-
-	public boolean hasMaster() {
-		return hasMaster;
-	}
-
-	public void setHasMaster(boolean hasMaster) {
-		this.hasMaster = hasMaster;
 	}
 
 	/** 

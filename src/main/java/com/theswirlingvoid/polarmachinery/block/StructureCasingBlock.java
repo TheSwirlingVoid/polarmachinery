@@ -8,6 +8,7 @@ import com.theswirlingvoid.polarmachinery.blockentity.generic.MultiblockBlockEnt
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -32,36 +33,35 @@ public class StructureCasingBlock extends Block implements EntityBlock {
 	@Override
 	public void onPlace(BlockState state, Level level, BlockPos pos, BlockState state2, boolean bool) {
 		MultiblockBlockEntity blockEntity = (MultiblockBlockEntity) level.getBlockEntity(pos);
-		blockEntity.setMaster(true);
-		blockEntity.setHasMaster(false);
 		BlockPos[] mostAndLowest = {pos, pos}; // 0 = lowest, 1 = most
 		List<BlockPos> allBlocks = blockEntity.snakeSearchAndRun((b) -> {
-			if (b != blockEntity) {
-				b.setMaster(false);
-				b.setHasMaster(true);
-			}
-
 			BlockPos thisPos = b.getBlockPos();
-			int sum = thisPos.getX() + thisPos.getY() + thisPos.getZ();
-			BlockPos most = mostAndLowest[0];
-			BlockPos lowest = mostAndLowest[1];
-			int mostSum = most.getX() + most.getY() + most.getZ();
-			int lowestSum = lowest.getX() + lowest.getY() + lowest.getZ();
-			if (sum > mostSum) {
+			BlockPos most = mostAndLowest[1];
+			BlockPos lowest = mostAndLowest[0];
+			BlockPos compareMost = thisPos.subtract(most);
+			BlockPos compareLeast = thisPos.subtract(lowest);
+			if (compareMost.getX() >= 0 && compareMost.getY() >= 0 && compareMost.getZ() >= 0) {
 				mostAndLowest[1] = thisPos;
 			}
-			else if (sum < lowestSum) {
+			else if (compareLeast.getX() <= 0 && compareLeast.getY() <= 0 && compareLeast.getZ() <= 0) {
 				mostAndLowest[0] = thisPos;
 			}
 		}, new ArrayList<BlockPos>());
 
-		for (BlockPos blockPos : allBlocks) {
-			MultiblockBlockEntity foundBE = (MultiblockBlockEntity) level.getBlockEntity(blockPos);
-			// TODO: remove test line below
-			System.out.println(String.format("isMaster: %b; hasMaster: %b", foundBE.isMaster(), foundBE.hasMaster()));
+		if (allBlocks.isEmpty()) {
+			blockEntity.setMaster(true);
+		}
+		else {
+			for (BlockPos blockPos : allBlocks) {
+				MultiblockBlockEntity foundBE = (MultiblockBlockEntity) level.getBlockEntity(blockPos);
+				// TODO: remove test line below
+				System.out.println(String.format("isMaster: %b", foundBE.isMaster()));
+			}
 		}
 		// TODO: remove test line below
-		level.players().get(0).sendMessage(new TextComponent("Lowest Pos: " + mostAndLowest[0] + ". Most Pos: " + mostAndLowest[1]), Util.NIL_UUID);
+		level.players().get(0).sendMessage(new TextComponent("Dimensions: " + mostAndLowest[1].subtract(mostAndLowest[0]).subtract(new Vec3i(-1, -1, -1)).toShortString()), Util.NIL_UUID);
+		level.players().get(0).sendMessage(new TextComponent("Block Count: " + allBlocks.size()), Util.NIL_UUID);
+		level.players().get(0).sendMessage(new TextComponent("Lowest: " + mostAndLowest[0] + "Most: " + mostAndLowest[1]), Util.NIL_UUID);
 	}
 	
 }
